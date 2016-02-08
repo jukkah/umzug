@@ -53,6 +53,9 @@ Using the [`sequelize` storage](lib/storages/sequelize.js) will create a table i
 }
 ```
 
+### None
+If want to run migrations without storing them anywhere, you can use the [`none` storage](lib/storages/none.js).
+
 ### Custom
 In order to use a custom storage, you can create and publish a module which has to fulfill the following API. You can just pass the name of the module to the configuration and *umzug* will require it accordingly. The API that needs to be exposed looks like this:
 
@@ -220,6 +223,12 @@ It is possible to pass the name of a migration until which the migrations should
 umzug.down({ to: '20141031080000-task' }).then(function (migrations) {
   // "migrations" will be an Array with the names of all reverted migrations.
 });
+```
+
+To revert all migrations, you can pass 0 as the `to` parameter:
+
+```js
+umzug.down({ to: 0 });
 ```
 
 Reverting specific migrations while ignoring the right order, can be done like this:
