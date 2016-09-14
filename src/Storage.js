@@ -6,7 +6,6 @@ export default class Storage {
      * Constructs a new Storage.
      */
     constructor() {
-        
     }
 
     /**

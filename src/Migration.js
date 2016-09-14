@@ -61,7 +61,7 @@ export default class Migration {
      *
      * // check if resolver based migration exists
      * (new Migration(resolver)).exists().then(...)
-     * 
+     *
      * @returns {Promise<boolean>}
      */
     exists() {

@@ -1,0 +1,19 @@
+{
+  "source": "./src",
+  "excludes": ["\\.test\\.js"],
+  "destination": "./docs",
+  "test": {
+    "type": "mocha",
+    "source": "./src",
+    "includes": ["\\.test\\.js"]
+  },
+  "title": "Umzug",
+  "manual": {
+    "overview": ["./manual/overview.md"],
+    "installation": ["./manual/installation.md"],
+    "usage": ["./manual/usage.md"],
+    "example": ["./manual/example.md"],
+    "faq": ["./manual/faq.md"],
+    "changelog": ["./CHANGELOG.md"]
+  }
+}

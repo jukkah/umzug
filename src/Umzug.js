@@ -77,6 +77,7 @@ export default class Umzug extends EventEmitter {
     static createBuiltInStorage(type, options) {
         return new Storage();
     }
+
     /**
      * Constructs Umzug instance.
      *
