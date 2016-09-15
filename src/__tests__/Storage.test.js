@@ -92,8 +92,8 @@ describe('Storage', () => {
             return new Promise((resolve) => {
                 expect(() => {
                     Promise.resolve()
-                        .then(() => storage.log('20160911222845-task'))
-                        .then(() => storage.log('20160911222845-task', '20160911223053-task'))
+                        .then(() => storage.log('1-migration'))
+                        .then(() => storage.log('2-migration', '3-migration'))
                         .then(resolve);
                 }).not.toThrow();
             });
@@ -105,8 +105,8 @@ describe('Storage', () => {
                 expect(() => {
                     Promise.resolve()
                         .then(() => storage.log([]))
-                        .then(() => storage.log(['20160911222845-task']))
-                        .then(() => storage.log(['20160911222845-task', '20160911223053-task']))
+                        .then(() => storage.log('1-migration'))
+                        .then(() => storage.log('2-migration', '3-migration'))
                         .then(resolve);
                 }).not.toThrow();
             });
@@ -116,7 +116,7 @@ describe('Storage', () => {
          * @test {Storage#log}
          */
         it('should not remember what has been logged', () => {
-            return storage.log('20160911222845-task')
+            return storage.log('1-migration')
                 .then(() => storage.executed())
                 .catch((error) => {
                     expect(error).not.toEqual(jasmine.any(Error));
@@ -162,8 +162,8 @@ describe('Storage', () => {
             return new Promise((resolve) => {
                 expect(() => {
                     Promise.resolve()
-                        .then(() => storage.unlog('20160911222845-task'))
-                        .then(() => storage.unlog('20160911222845-task', '20160911223053-task'))
+                        .then(() => storage.unlog('1-migration'))
+                        .then(() => storage.unlog('2-migration', '3-migration'))
                         .then(resolve);
                 }).not.toThrow();
             });
@@ -175,8 +175,8 @@ describe('Storage', () => {
                 expect(() => {
                     Promise.resolve()
                         .then(() => storage.unlog([]))
-                        .then(() => storage.unlog(['20160911222845-task']))
-                        .then(() => storage.unlog(['20160911222845-task', '20160911223053-task']))
+                        .then(() => storage.unlog('1-migration'))
+                        .then(() => storage.unlog('2-migration', '3-migration'))
                         .then(resolve);
                 }).not.toThrow();
             });
@@ -186,7 +186,7 @@ describe('Storage', () => {
          * @test {Storage#unlog}
          */
         it('should not remember what has been unlogged', () => {
-            return storage.unlog('20160911222845-task')
+            return storage.unlog('1-migration')
                 .then(() => storage.executed())
                 .catch((error) => {
                     expect(error).not.toEqual(jasmine.any(Error));
