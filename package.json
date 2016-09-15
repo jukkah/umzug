@@ -32,7 +32,8 @@
     "yargs": "^5.0.0"
   },
   "scripts": {
-    "test": "./node_modules/.bin/jest src",
+    "test": "gulp",
+    "jest": "./node_modules/.bin/jest src",
     "docs": "./node_modules/.bin/esdoc -c esdoc.json",
     "build": "./node_modules/.bin/babel src/ -d lib -s"
   },
