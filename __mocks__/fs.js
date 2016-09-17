@@ -12,8 +12,8 @@ let mockFiles = {};
  *
  * @param {object} newMockFiles new files
  */
-fs.__setMockFiles = (newMockFiles) => {
-    mockFiles = newMockFiles || {};
+fs.setMockFiles = (newMockFiles) => {
+  mockFiles = newMockFiles || {};
 };
 
 /**
@@ -21,9 +21,7 @@ fs.__setMockFiles = (newMockFiles) => {
  *
  * @returns {object}
  */
-fs.__getMockFiles = () => {
-    return mockFiles;
-};
+fs.getMockFiles = () => mockFiles;
 
 /**
  * Mocked version of fs.writeFile.
@@ -31,8 +29,8 @@ fs.__getMockFiles = () => {
  * @see {fs.writeFile} https://nodejs.org/dist/latest-v6.x/docs/api/fs.html#fs_fs_writefile_file_data_options_callback
  */
 fs.writeFile = jest.fn((file, data, callback) => {
-    mockFiles[file] = data;
-    callback(null);
+  mockFiles[file] = data;
+  callback(null);
 });
 
 /**
@@ -41,11 +39,11 @@ fs.writeFile = jest.fn((file, data, callback) => {
  * @see {fs.readFile} https://nodejs.org/dist/latest-v6.x/docs/api/fs.html#fs_fs_readfile_file_options_callback
  */
 fs.readFile = jest.fn((file, callback) => {
-    if (mockFiles[file]) {
-        callback(null, mockFiles[file]);
-    } else {
-        callback(new Error(`Mocked file for '${file}' not found`));
-    }
+  if (mockFiles[file]) {
+    callback(null, mockFiles[file]);
+  } else {
+    callback(new Error(`Mocked file for '${file}' not found`));
+  }
 });
 
 export default fs;
