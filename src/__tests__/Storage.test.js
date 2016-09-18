@@ -1,3 +1,5 @@
+/* eslint arrow-body-style: "off" */
+
 import Storage from '../Storage';
 
 /** @test {Storage} */

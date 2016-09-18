@@ -1,3 +1,5 @@
+/* eslint no-irregular-whitespace: "off" */
+
 import EventEmitter from 'events';
 import Storage from './Storage';
 
@@ -79,6 +81,15 @@ export default class Umzug extends EventEmitter {
   }
 
   /**
+   * @typedef {function : MigrationModule|MigrationModule[]} GlobalMigrationModuleResolver
+   * @param {string} [name='*'] Migration module name. Defaults to all.
+   * @returns {MigrationModule|MigrationModule[]|Promise<MigrationModule|MigrationModule[]>}
+   *     Migration module(s) or promise that resolves to them. If _name_ is
+   *     specified, the result is MigrationModule. Otherwise (_name = '*'_),
+   *     the result it MigrationModule[].
+   */
+
+  /**
    * Constructs Umzug instance.
    *
    * @example
@@ -104,10 +115,10 @@ export default class Umzug extends EventEmitter {
    * @param {Storage} options.storage Storage instance to use.
    * @param {function(message: string)} [options.log] The logging function that
    *     gets executed every time migrations start and have ended.
-   * @param {string|string[]|object|object[]|function(name: string) : object|function() : object[]|object} options.migrations
+   * @param {string|string[]|MigrationModule|MigrationModule[]|GlobalMigrationModuleResolver|object} options.migrations
    *     Either `options.migrations.modules` or object containing that and other
    *     configuration.
-   * @param {string|string[]|object|object[]|function(name: string) : object|function() : object[]} options.migrations.modules
+   * @param {string|string[]|MigrationModule|MigrationModule[]|GlobalMigrationModuleResolver} options.migrations.modules
    *     Glob or path to migration files or migration modules itself or resolver
    *     function.
    * @param {string|function(module: object) : string|function} [options.migrations.up='up']

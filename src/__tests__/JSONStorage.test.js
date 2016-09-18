@@ -1,3 +1,5 @@
+/* eslint import/imports-first: "off", arrow-body-style: "off" */
+
 jest.mock('fs');
 
 import fs from 'fs';
@@ -418,7 +420,7 @@ describe('JSONStorage', () => {
             .then(resolve);
         }).not.toThrow();
       }).then(() => {
-                // expect new items is not added
+        // expect new items is not added
         expect(fs.writeFile).toBeCalled();
         expect(fs.getMockFiles()).toEqual({
           [CUSTOM_PATH]: [

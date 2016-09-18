@@ -1,12 +1,28 @@
 /**
+ * @typedef {object} MigrationModule
+ * @property {function} [`up`] Up function. Function name is configurable.
+ * @property {function} [`down`] Down function. Function name is configurable.
+ * @property {string|string[]|function () : string|string[]} [migrations]
+ *     List of migrations combined in the module. Defaults to filename.
+ */
+
+/**
+ * Resolves migration module.
+ *
+ * @typedef {function} MigrationModuleResolver
+ * @returns {MigrationModule|Promise<MigrationModule>}
+ */
+
+/**
  * Wrapper class for migration modules.
  */
 export default class Migration {
   /**
    * Constructs a new Migration.
    *
-   * @param {string|object|function() : object} module Path to file, module
-   *     object, or resolver function.
+   * @param {string|MigrationModule|MigrationModuleResolver} module
+   *     Path to file that can be required by Node.js, migration module itself,
+   *     or resolver function that returns it.
    * @param {object} [options]
    * @param {string|function(module: object) : string} [options.up='up']
    *     Up method resolver; either its name or function that return it.
