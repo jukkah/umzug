@@ -38,7 +38,7 @@
   },
   "scripts": {
     "test": "gulp",
-    "jest": "./node_modules/.bin/jest src",
+    "jest": "./node_modules/.bin/jest src --verbose",
     "lint": "./node_modules/.bin/eslint src __mocks__",
     "docs": "./node_modules/.bin/esdoc -c esdoc.json",
     "build": "./node_modules/.bin/babel src/ -d lib -s"
