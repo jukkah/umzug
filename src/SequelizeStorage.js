@@ -81,7 +81,7 @@ export default class SequelizeStorage extends Storage {
    *     timestamp: 'executed_at'
    * })
    *
-   * @param {object} [options]
+   * @param {!object} [options]
    * @param {!Model} [options.model] Sequelize model - must have column names
    *     matching to `options.name` and `options.timestamp`.
    * @param {string} [options.name='name'] Name of name column.

@@ -1,3 +1,8 @@
+/* eslint no-param-reassign: "off" */
+
+import fs from 'fs';
+import _ from 'lodash';
+
 import Storage from './Storage';
 
 /**
@@ -17,8 +22,10 @@ export default class JSONStorage extends Storage {
    * @param {object} [options]
    * @param {string} [options.path='./umzug.json']
    */
-  constructor(options) {
+  constructor(options = {}) {
     super();
+
+    this.file = options.path || './umzug.json';
   }
 
   /**
@@ -36,7 +43,23 @@ export default class JSONStorage extends Storage {
    * @returns {Promise}
    */
   log(...migrations) {
-    return Promise.resolve();
+    const timestamp = (new Date()).toJSON();
+    migrations = _.flattenDeep(migrations || []);
+    migrations = migrations.map(name => ({ name, timestamp }));
+    if (migrations.length === 0) return Promise.resolve();
+    if (_.uniq(migrations).length < migrations.length) {
+      return Promise.reject(new Error('Duplicates are not allowed in param ...migrations'));
+    }
+
+    return this.executed({ withTimestamps: true })
+      .then((all) => {
+        if (_.intersectionBy(all, migrations, 'name').length > 0) {
+          throw new Error('Some migrations were already executed');
+        }
+        return all;
+      })
+      .then(executed => [...executed, ...migrations])
+      .then(all => this.writeFile(this.file, JSON.stringify(all)));
   }
 
   /**
@@ -54,7 +77,22 @@ export default class JSONStorage extends Storage {
    * @returns {Promise}
    */
   unlog(...migrations) {
-    return Promise.resolve();
+    migrations = _.flattenDeep(migrations || []);
+    migrations = migrations.map(name => ({ name }));
+    if (migrations.length === 0) return Promise.resolve();
+    if (_.uniq(migrations).length < migrations.length) {
+      return Promise.reject(new Error('Duplicates are not allowed in param ...migrations'));
+    }
+
+    return this.executed({ withTimestamps: true })
+      .then((all) => {
+        if (_.differenceBy(migrations, all, 'name').length > 0) {
+          throw new Error('Some migrations were not already executed');
+        }
+        return all;
+      })
+      .then(all => _.differenceBy(all, migrations, 'name'))
+      .then(rest => this.writeFile(this.file, JSON.stringify(rest)));
   }
 
   /**
@@ -80,7 +118,51 @@ export default class JSONStorage extends Storage {
    *     `Promise<Array<{name: string, timestamp: string}>>`. Otherwise,
    *     _without timestamps_, it is `Promise<string[]>`.
    */
-  executed(options) {
-    return Promise.resolve([]);
+  executed(options = {}) {
+    return this.readFile(this.file)
+      .catch(() => '[]')
+      .then(content => JSON.parse(content))
+      .then(result => result.map(entry => (
+        options.withTimestamps ? entry : entry.name
+      )));
+  }
+
+  /**
+   * Read content from file.
+   *
+   * @param {string} file
+   * @return {Promise<string>}
+   * @private
+   */
+  readFile(file) {
+    return new Promise((resolve, reject) => {
+      fs.readFile(file, (error, data) => {
+        if (error) {
+          reject(error);
+        }
+
+        resolve(data);
+      });
+    });
+  }
+
+  /**
+   * Write content to file.
+   *
+   * @param {string} file
+   * @param {string} data
+   * @returns {Promise}
+   * @private
+   */
+  writeFile(file, data) {
+    return new Promise((resolve, reject) => {
+      fs.writeFile(file, data, (error) => {
+        if (error) {
+          reject(error);
+        }
+
+        resolve();
+      });
+    });
   }
 }
