@@ -11,23 +11,28 @@ const CUSTOM_PATH = './file.json';
 const EMPTY_FS = {};
 
 const NON_EMPTY_FS_2 = {
-  [CUSTOM_PATH]: [
+  [CUSTOM_PATH]: JSON.stringify([
     { name: '1-mock', timestamp: '1-timestamp' },
     { name: '2-mock', timestamp: '2-timestamp' },
-  ],
+  ]),
 };
 
 const NON_EMPTY_FS_3 = {
-  [CUSTOM_PATH]: [
+  [CUSTOM_PATH]: JSON.stringify([
     { name: '1-mock', timestamp: '1-timestamp' },
     { name: '2-mock', timestamp: '2-timestamp' },
     { name: '3-mock', timestamp: '3-timestamp' },
-  ],
+  ]),
 };
+
+const ANY_ISO_DATE = jasmine.stringMatching(
+  /^\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)$/
+);
 
 /** @test {JSONStorage} */
 describe('constructor', () => {
   beforeEach(() => {
+    fs.resetMock();
     fs.setMockFiles(EMPTY_FS);
   });
 
@@ -69,6 +74,7 @@ describe('executed', () => {
   let storage;
 
   beforeEach(() => {
+    fs.resetMock();
     fs.setMockFiles(EMPTY_FS);
     storage = new JSONStorage({ path: CUSTOM_PATH });
   });
@@ -84,7 +90,7 @@ describe('executed', () => {
     }).then(() => {
       // expect there is only one read from CUSTOM_PATH
       expect(fs.readFile.mock.calls.length).toBe(1);
-      expect(fs.readFile.mock.calls[0].length).toBeGraterThan(0);
+      expect(fs.readFile.mock.calls[0].length).toBeGreaterThan(0);
       expect(fs.readFile.mock.calls[0][0]).toBe(CUSTOM_PATH);
       expect(fs.writeFile).not.toBeCalled();
       expect(fs.getMockFiles()).toEqual(EMPTY_FS);
@@ -103,7 +109,7 @@ describe('executed', () => {
 
         // expect there is only one read from CUSTOM_PATH
         expect(fs.readFile.mock.calls.length).toBe(1);
-        expect(fs.readFile.mock.calls[0].length).toBeGraterThan(0);
+        expect(fs.readFile.mock.calls[0].length).toBeGreaterThan(0);
         expect(fs.readFile.mock.calls[0][0]).toBe(CUSTOM_PATH);
         expect(fs.writeFile).not.toBeCalled();
         expect(fs.getMockFiles()).toEqual(EMPTY_FS);
@@ -118,7 +124,7 @@ describe('executed', () => {
 
         // expect there is only one read from CUSTOM_PATH
         expect(fs.readFile.mock.calls.length).toBe(1);
-        expect(fs.readFile.mock.calls[0].length).toBeGraterThan(0);
+        expect(fs.readFile.mock.calls[0].length).toBeGreaterThan(0);
         expect(fs.readFile.mock.calls[0][0]).toBe(CUSTOM_PATH);
       });
   });
@@ -156,14 +162,14 @@ describe('executed', () => {
   it('should resolve to (name, timestamp) array if called with withTimestamps = true as an option', () => {
     fs.setMockFiles(NON_EMPTY_FS_2);
 
-    const expectedResult = NON_EMPTY_FS_2[CUSTOM_PATH];
+    const expectedResult = JSON.parse(NON_EMPTY_FS_2[CUSTOM_PATH]);
 
     return storage.executed({ withTimestamps: true })
       .then((value) => {
         expect(value).toEqual(expectedResult);
 
         // expect fs not edited
-        expect(fs.readFile).not.toBeCalled();
+        expect(fs.readFile).toBeCalled();
         expect(fs.writeFile).not.toBeCalled();
         expect(fs.getMockFiles()).toEqual(NON_EMPTY_FS_2);
       });
@@ -173,7 +179,7 @@ describe('executed', () => {
   it('should resolve to array of items in json file', () => {
     fs.setMockFiles(NON_EMPTY_FS_2);
 
-    const expectedResult = NON_EMPTY_FS_2[CUSTOM_PATH];
+    const expectedResult = JSON.parse(NON_EMPTY_FS_2[CUSTOM_PATH]);
 
     return storage.executed({ withTimestamps: true })
       .then((value) => {
@@ -181,7 +187,7 @@ describe('executed', () => {
 
         // expect there is only one read from CUSTOM_PATH
         expect(fs.readFile.mock.calls.length).toBe(1);
-        expect(fs.readFile.mock.calls[0].length).toBeGraterThan(0);
+        expect(fs.readFile.mock.calls[0].length).toBeGreaterThan(0);
         expect(fs.readFile.mock.calls[0][0]).toBe(CUSTOM_PATH);
         expect(fs.writeFile).not.toBeCalled();
         expect(fs.getMockFiles()).toEqual(NON_EMPTY_FS_2);
@@ -194,6 +200,7 @@ describe('log', () => {
   let storage;
 
   beforeEach(() => {
+    fs.resetMock();
     fs.setMockFiles(EMPTY_FS);
     storage = new JSONStorage({ path: CUSTOM_PATH });
   });
@@ -203,7 +210,7 @@ describe('log', () => {
     return new Promise((resolve) => {
       expect(() => {
         resolve(
-            storage.log()
+          storage.log()
         );
       }).not.toThrow();
     }).then(() => {
@@ -233,82 +240,66 @@ describe('log', () => {
 
   /** @test {JSONStorage#log} */
   it('should accept multiple strings as parameter', () => {
-    return new Promise((resolve) => {
-      expect(() => {
-        Promise.resolve()
-          .then(() => storage.log('1-migration'))
-          .then(() => storage.log('2-migration', '3-migration'))
-          .then(resolve);
-      }).not.toThrow();
-    });
+    return Promise.resolve()
+      .then(() => storage.log('1-migration'))
+      .then(() => storage.log('2-migration', '3-migration'))
+      .catch(error => expect(error).toBeUndefined());
   });
 
   /** @test {JSONStorage#log} */
   it('should accept an string array as parameter', () => {
-    return new Promise((resolve) => {
-      expect(() => {
-        Promise.resolve()
-          .then(() => storage.log([]))
-          .then(() => storage.log('1-migration'))
-          .then(() => storage.log('2-migration', '3-migration'))
-          .then(resolve);
-      }).not.toThrow();
-    });
+    return Promise.resolve()
+      .then(() => storage.log([]))
+      .then(() => storage.log(['1-migration']))
+      .then(() => storage.log(['2-migration', '3-migration']))
+      .catch(error => expect(error).toBeUndefined());
   });
 
   /** @test {JSONStorage#log} */
   it('should create the json file if it doesn\'t exist', () => {
-    return storage.log('20160911222845-task')
+    return storage.log('1-migration')
       .then(() => {
-          // expect file is created
-        expect(fs.writeFile).not.toBeCalled();
-        expect(fs.getMockFiles()).toEqual({
-          [CUSTOM_PATH]: [
-            { name: '1-migration', timestamp: jasmine.any(String) },
-          ],
-        });
+        // expect file is created
+        expect(fs.readFile).toBeCalled();
+        expect(fs.writeFile).toBeCalled();
+        expect(fs.getMockFiles()).toEqual({ [CUSTOM_PATH]: jasmine.any(String) });
+        expect(JSON.parse(fs.getMockFiles()[CUSTOM_PATH])).toEqual([
+          { name: '1-migration', timestamp: ANY_ISO_DATE },
+        ]);
       });
   });
 
   /** @test {JSONStorage#log} */
   it('should fail without affecting the json file if trying to log items that are already executed', () => {
-    fs.setMockFiles(EMPTY_FS);
+    fs.setMockFiles(NON_EMPTY_FS_2);
 
-    return new Promise((resolve) => {
-      expect(() => {
-        Promise.resolve()
-          .then(() => storage.log(['1-mock', '1-migration']))
-          .then(resolve);
-      }).toThrow();
-    }).then(() => {
-      // expect fs not edited
-      expect(fs.writeFile).not.toBeCalled();
-      expect(fs.getMockFiles()).toEqual(NON_EMPTY_FS_2);
-    });
+    return storage.log(['1-mock', '1-migration'])
+      .then(() => expect(undefined).toBeDefined())
+      .catch(error => expect(error).toBeDefined())
+      .then(() => {
+        // expect fs not edited
+        expect(fs.writeFile).not.toBeCalled();
+        expect(fs.getMockFiles()).toEqual(NON_EMPTY_FS_2);
+      });
   });
 
   /** @test {JSONStorage#log} */
   it('should not affect to existing items is the json file', () => {
-    fs.setMockFiles(EMPTY_FS);
+    fs.setMockFiles(NON_EMPTY_FS_2);
 
-    return new Promise((resolve) => {
-      expect(() => {
-        Promise.resolve()
-          .then(() => storage.log(['1-migration', '2-migration']))
-          .then(resolve);
-      }).not.toThrow();
-    }).then(() => {
-      // expect old items still exists
-      expect(fs.writeFile).toBeCalled();
-      expect(fs.getMockFiles()).toEqual({
-        [CUSTOM_PATH]: [
+    return storage.log(['1-migration', '2-migration'])
+      .catch(error => expect(error).toBeUndefined())
+      .then(() => {
+        // expect old items still exists
+        expect(fs.writeFile).toBeCalled();
+        expect(fs.getMockFiles()).toEqual({ [CUSTOM_PATH]: jasmine.any(String) });
+        expect(JSON.parse(fs.getMockFiles()[CUSTOM_PATH])).toEqual([
           { name: '1-mock', timestamp: '1-timestamp' },
           { name: '2-mock', timestamp: '2-timestamp' },
-          { name: '1-migration', timestamp: jasmine.any(String) },
-          { name: '2-migration', timestamp: jasmine.any(String) },
-        ],
+          { name: '1-migration', timestamp: ANY_ISO_DATE },
+          { name: '2-migration', timestamp: ANY_ISO_DATE },
+        ]);
       });
-    });
   });
 });
 
@@ -317,6 +308,7 @@ describe('unlog', () => {
   let storage;
 
   beforeEach(() => {
+    fs.resetMock();
     fs.setMockFiles(NON_EMPTY_FS_3);
     storage = new JSONStorage({ path: CUSTOM_PATH });
   });
@@ -326,7 +318,7 @@ describe('unlog', () => {
     return new Promise((resolve) => {
       expect(() => {
         resolve(
-            storage.unlog()
+          storage.unlog()
         );
       }).not.toThrow();
     }).then(() => {
@@ -356,79 +348,60 @@ describe('unlog', () => {
 
   /** @test {JSONStorage#unlog} */
   it('it should accept multiple strings as parameter', () => {
-    return new Promise((resolve) => {
-      expect(() => {
-        Promise.resolve()
-          .then(() => storage.unlog('1-mock'))
-          .then(() => storage.unlog('2-mock', '3-mock'))
-          .then(resolve);
-      }).not.toThrow();
-    });
+    return Promise.resolve()
+      .then(() => storage.unlog('1-mock'))
+      .then(() => storage.unlog('2-mock', '3-mock'))
+      .catch(error => expect(error).toBeUndefined());
   });
 
   /** @test {JSONStorage#unlog} */
   it('it should accept an string array as parameter', () => {
-    return new Promise((resolve) => {
-      expect(() => {
-        Promise.resolve()
-          .then(() => storage.unlog([]))
-          .then(() => storage.unlog('1-mock'))
-          .then(() => storage.unlog('2-mock', '3-mock'))
-          .then(resolve);
-      }).not.toThrow();
-    });
+    return Promise.resolve()
+      .then(() => storage.unlog([]))
+      .then(() => storage.unlog('1-mock'))
+      .then(() => storage.unlog('2-mock', '3-mock'))
+      .catch(error => expect(error).toBeUndefined());
   });
 
   /** @test {JSONStorage#unlog} */
   it('it should not create the json file if it doesn\'t exist', () => {
     fs.setMockFiles(EMPTY_FS);
 
-    return new Promise((resolve) => {
-      expect(() => {
-        Promise.resolve()
-          .then(() => storage.unlog(['1-mock']))
-          .then(resolve);
-      }).toThrow();
-    }).then(() => {
-      // expect fs not edited
-      expect(fs.writeFile).not.toBeCalled();
-      expect(fs.getMockFiles()).toEqual(EMPTY_FS);
-    });
+    return storage.unlog('1-migration')
+      .then(() => expect(undefined).toBeDefined())
+      .catch(error => expect(error).toBeDefined())
+      .then(() => {
+        // expect fs not edited
+        expect(fs.writeFile).not.toBeCalled();
+        expect(fs.getMockFiles()).toEqual(EMPTY_FS);
+      });
   });
 
   /** @test {JSONStorage#unlog} */
   it('it should fail without affecting the json file if trying to unlog items that are not executed yet', () => {
-    return new Promise((resolve) => {
-      expect(() => {
-        Promise.resolve()
-          .then(() => storage.unlog(['1-mock', '1-migration']))
-          .then(resolve);
-      }).toThrow();
-    }).then(() => {
-      // expect fs not edited
-      expect(fs.writeFile).not.toBeCalled();
-      expect(fs.getMockFiles()).toEqual(NON_EMPTY_FS_3);
-    });
+    return storage.unlog(['1-mock', '1-migration'])
+      .then(() => expect(undefined).toBeDefined())
+      .catch(error => expect(error).toBeDefined())
+      .then(() => {
+        // expect fs not edited
+        expect(fs.writeFile).not.toBeCalled();
+        expect(fs.getMockFiles()).toEqual(NON_EMPTY_FS_3);
+      });
   });
 
   /** @test {JSONStorage#unlog} */
   it('it should not add any items to the json file', () => {
     fs.setMockFiles(NON_EMPTY_FS_3);
 
-    return new Promise((resolve) => {
-      expect(() => {
-        Promise.resolve()
-          .then(() => storage.unlog(['1-mock', '2-mock']))
-          .then(resolve);
-      }).not.toThrow();
-    }).then(() => {
-      // expect new items is not added
-      expect(fs.writeFile).toBeCalled();
-      expect(fs.getMockFiles()).toEqual({
-        [CUSTOM_PATH]: [
+    return storage.unlog(['1-mock', '2-mock'])
+      .catch(error => expect(error).toBeUndefined())
+      .then(() => {
+        // expect new items is not added
+        expect(fs.writeFile).toBeCalled();
+        expect(fs.getMockFiles()).toEqual({ [CUSTOM_PATH]: jasmine.any(String) });
+        expect(JSON.parse(fs.getMockFiles()[CUSTOM_PATH])).toEqual([
           { name: '3-mock', timestamp: '3-timestamp' },
-        ],
+        ]);
       });
-    });
   });
 });
