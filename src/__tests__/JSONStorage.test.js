@@ -25,6 +25,10 @@ const FS_3_MIGRATIONS = {
   ]),
 };
 
+const FS_CORRUPTED = {
+  [CUSTOM_PATH]: FS_2_MIGRATIONS[CUSTOM_PATH].slice(0, -1),
+};
+
 const ANY_ISO_DATE = jasmine.stringMatching(
   /^\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)$/
 );
@@ -126,6 +130,20 @@ describe('executed', () => {
         expect(fs.readFile.mock.calls.length).toBe(1);
         expect(fs.readFile.mock.calls[0].length).toBeGreaterThan(0);
         expect(fs.readFile.mock.calls[0][0]).toBe(CUSTOM_PATH);
+      });
+  });
+
+  /** @test {JSONStorage#unlog} */
+  it('it should fail without if json file is corrupted', () => {
+    fs.setMockFiles(FS_CORRUPTED);
+
+    return storage.executed()
+      .then(() => expect(undefined).toBeDefined())
+      .catch(error => expect(error).toBeDefined())
+      .then(() => {
+        // expect fs not edited
+        expect(fs.writeFile).not.toBeCalled();
+        expect(fs.getMockFiles()).toEqual(FS_CORRUPTED);
       });
   });
 
@@ -269,6 +287,20 @@ describe('log', () => {
       });
   });
 
+  /** @test {JSONStorage#unlog} */
+  it('it should fail without affecting the json file if corrupted', () => {
+    fs.setMockFiles(FS_CORRUPTED);
+
+    return storage.log('3-mock')
+      .then(() => expect(undefined).toBeDefined())
+      .catch(error => expect(error).toBeDefined())
+      .then(() => {
+        // expect fs not edited
+        expect(fs.writeFile).not.toBeCalled();
+        expect(fs.getMockFiles()).toEqual(FS_CORRUPTED);
+      });
+  });
+
   /** @test {JSONStorage#log} */
   it('should fail without affecting the json file if trying to log items that are already executed', () => {
     fs.setMockFiles(FS_2_MIGRATIONS);
@@ -374,6 +406,20 @@ describe('unlog', () => {
         // expect fs not edited
         expect(fs.writeFile).not.toBeCalled();
         expect(fs.getMockFiles()).toEqual(FS_EMPTY);
+      });
+  });
+
+  /** @test {JSONStorage#unlog} */
+  it('it should fail without affecting the json file if corrupted', () => {
+    fs.setMockFiles(FS_CORRUPTED);
+
+    return storage.unlog('1-mock')
+      .then(() => expect(undefined).toBeDefined())
+      .catch(error => expect(error).toBeDefined())
+      .then(() => {
+        // expect fs not edited
+        expect(fs.writeFile).not.toBeCalled();
+        expect(fs.getMockFiles()).toEqual(FS_CORRUPTED);
       });
   });
 
