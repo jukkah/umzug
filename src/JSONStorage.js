@@ -3,7 +3,27 @@
 import fs from 'fs';
 import _ from 'lodash';
 
+import helper from './Helper';
 import Storage from './Storage';
+
+/**
+ * Read content from file.
+ *
+ * @param {string} file
+ * @return {Promise<string>}
+ * @private
+ */
+const readFile = helper.promisify(fs.readFile);
+
+/**
+ * Write content to file.
+ *
+ * @param {string} file
+ * @param {string} data
+ * @returns {Promise}
+ * @private
+ */
+const writeFile = helper.promisify(fs.writeFile);
 
 /**
  * A storage that saves executed migrations to JSON file.
@@ -59,7 +79,7 @@ export default class JSONStorage extends Storage {
         return all;
       })
       .then(executed => [...executed, ...migrations])
-      .then(all => this.writeFile(this.file, JSON.stringify(all)));
+      .then(all => writeFile(this.file, JSON.stringify(all)));
   }
 
   /**
@@ -92,7 +112,7 @@ export default class JSONStorage extends Storage {
         return all;
       })
       .then(all => _.differenceBy(all, migrations, 'name'))
-      .then(rest => this.writeFile(this.file, JSON.stringify(rest)));
+      .then(rest => writeFile(this.file, JSON.stringify(rest)));
   }
 
   /**
@@ -119,50 +139,11 @@ export default class JSONStorage extends Storage {
    *     _without timestamps_, it is `Promise<string[]>`.
    */
   executed(options = {}) {
-    return this.readFile(this.file)
+    return readFile(this.file)
       .catch(() => '[]')
       .then(content => JSON.parse(content))
       .then(result => result.map(entry => (
         options.withTimestamps ? entry : entry.name
       )));
-  }
-
-  /**
-   * Read content from file.
-   *
-   * @param {string} file
-   * @return {Promise<string>}
-   * @private
-   */
-  readFile(file) {
-    return new Promise((resolve, reject) => {
-      fs.readFile(file, (error, data) => {
-        if (error) {
-          reject(error);
-        }
-
-        resolve(data);
-      });
-    });
-  }
-
-  /**
-   * Write content to file.
-   *
-   * @param {string} file
-   * @param {string} data
-   * @returns {Promise}
-   * @private
-   */
-  writeFile(file, data) {
-    return new Promise((resolve, reject) => {
-      fs.writeFile(file, data, (error) => {
-        if (error) {
-          reject(error);
-        }
-
-        resolve();
-      });
-    });
   }
 }
