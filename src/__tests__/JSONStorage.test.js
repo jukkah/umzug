@@ -8,16 +8,16 @@ import JSONStorage from '../JSONStorage';
 
 const CUSTOM_PATH = './file.json';
 
-const EMPTY_FS = {};
+const FS_EMPTY = {};
 
-const NON_EMPTY_FS_2 = {
+const FS_2_MIGRATIONS = {
   [CUSTOM_PATH]: JSON.stringify([
     { name: '1-mock', timestamp: '1-timestamp' },
     { name: '2-mock', timestamp: '2-timestamp' },
   ]),
 };
 
-const NON_EMPTY_FS_3 = {
+const FS_3_MIGRATIONS = {
   [CUSTOM_PATH]: JSON.stringify([
     { name: '1-mock', timestamp: '1-timestamp' },
     { name: '2-mock', timestamp: '2-timestamp' },
@@ -33,7 +33,7 @@ const ANY_ISO_DATE = jasmine.stringMatching(
 describe('constructor', () => {
   beforeEach(() => {
     fs.resetMock();
-    fs.setMockFiles(EMPTY_FS);
+    fs.setMockFiles(FS_EMPTY);
   });
 
   /** @test {JSONStorage#constructor} */
@@ -49,7 +49,7 @@ describe('constructor', () => {
     // expect nothing done with fs
     expect(fs.readFile).not.toBeCalled();
     expect(fs.writeFile).not.toBeCalled();
-    expect(fs.getMockFiles()).toEqual(EMPTY_FS);
+    expect(fs.getMockFiles()).toEqual(FS_EMPTY);
   });
 
   /** @test {JSONStorage#constructor} */
@@ -65,7 +65,7 @@ describe('constructor', () => {
     // expect nothing done with fs
     expect(fs.readFile).not.toBeCalled();
     expect(fs.writeFile).not.toBeCalled();
-    expect(fs.getMockFiles()).toEqual(EMPTY_FS);
+    expect(fs.getMockFiles()).toEqual(FS_EMPTY);
   });
 });
 
@@ -75,7 +75,7 @@ describe('executed', () => {
 
   beforeEach(() => {
     fs.resetMock();
-    fs.setMockFiles(EMPTY_FS);
+    fs.setMockFiles(FS_EMPTY);
     storage = new JSONStorage({ path: CUSTOM_PATH });
   });
 
@@ -93,7 +93,7 @@ describe('executed', () => {
       expect(fs.readFile.mock.calls[0].length).toBeGreaterThan(0);
       expect(fs.readFile.mock.calls[0][0]).toBe(CUSTOM_PATH);
       expect(fs.writeFile).not.toBeCalled();
-      expect(fs.getMockFiles()).toEqual(EMPTY_FS);
+      expect(fs.getMockFiles()).toEqual(FS_EMPTY);
     });
   });
 
@@ -112,7 +112,7 @@ describe('executed', () => {
         expect(fs.readFile.mock.calls[0].length).toBeGreaterThan(0);
         expect(fs.readFile.mock.calls[0][0]).toBe(CUSTOM_PATH);
         expect(fs.writeFile).not.toBeCalled();
-        expect(fs.getMockFiles()).toEqual(EMPTY_FS);
+        expect(fs.getMockFiles()).toEqual(FS_EMPTY);
       });
   });
 
@@ -137,13 +137,13 @@ describe('executed', () => {
 
         // expect fs not edited
         expect(fs.writeFile).not.toBeCalled();
-        expect(fs.getMockFiles()).toEqual(EMPTY_FS);
+        expect(fs.getMockFiles()).toEqual(FS_EMPTY);
       });
   });
 
   /** @test {JSONStorage#executed} */
   it('should resolve to string array if called without parameters', () => {
-    fs.setMockFiles(NON_EMPTY_FS_2);
+    fs.setMockFiles(FS_2_MIGRATIONS);
 
     const expectedResult = ['1-mock', '2-mock'];
 
@@ -154,15 +154,15 @@ describe('executed', () => {
         // expect fs not edited
         expect(fs.readFile).toBeCalled();
         expect(fs.writeFile).not.toBeCalled();
-        expect(fs.getMockFiles()).toEqual(NON_EMPTY_FS_2);
+        expect(fs.getMockFiles()).toEqual(FS_2_MIGRATIONS);
       });
   });
 
   /** @test {JSONStorage#executed} */
   it('should resolve to (name, timestamp) array if called with withTimestamps = true as an option', () => {
-    fs.setMockFiles(NON_EMPTY_FS_2);
+    fs.setMockFiles(FS_2_MIGRATIONS);
 
-    const expectedResult = JSON.parse(NON_EMPTY_FS_2[CUSTOM_PATH]);
+    const expectedResult = JSON.parse(FS_2_MIGRATIONS[CUSTOM_PATH]);
 
     return storage.executed({ withTimestamps: true })
       .then((value) => {
@@ -171,15 +171,15 @@ describe('executed', () => {
         // expect fs not edited
         expect(fs.readFile).toBeCalled();
         expect(fs.writeFile).not.toBeCalled();
-        expect(fs.getMockFiles()).toEqual(NON_EMPTY_FS_2);
+        expect(fs.getMockFiles()).toEqual(FS_2_MIGRATIONS);
       });
   });
 
   /** @test {JSONStorage#executed} */
   it('should resolve to array of items in json file', () => {
-    fs.setMockFiles(NON_EMPTY_FS_2);
+    fs.setMockFiles(FS_2_MIGRATIONS);
 
-    const expectedResult = JSON.parse(NON_EMPTY_FS_2[CUSTOM_PATH]);
+    const expectedResult = JSON.parse(FS_2_MIGRATIONS[CUSTOM_PATH]);
 
     return storage.executed({ withTimestamps: true })
       .then((value) => {
@@ -190,7 +190,7 @@ describe('executed', () => {
         expect(fs.readFile.mock.calls[0].length).toBeGreaterThan(0);
         expect(fs.readFile.mock.calls[0][0]).toBe(CUSTOM_PATH);
         expect(fs.writeFile).not.toBeCalled();
-        expect(fs.getMockFiles()).toEqual(NON_EMPTY_FS_2);
+        expect(fs.getMockFiles()).toEqual(FS_2_MIGRATIONS);
       });
   });
 });
@@ -201,7 +201,7 @@ describe('log', () => {
 
   beforeEach(() => {
     fs.resetMock();
-    fs.setMockFiles(EMPTY_FS);
+    fs.setMockFiles(FS_EMPTY);
     storage = new JSONStorage({ path: CUSTOM_PATH });
   });
 
@@ -217,7 +217,7 @@ describe('log', () => {
       // expect fs untouched
       expect(fs.readFile).not.toBeCalled();
       expect(fs.writeFile).not.toBeCalled();
-      expect(fs.getMockFiles()).toEqual(EMPTY_FS);
+      expect(fs.getMockFiles()).toEqual(FS_EMPTY);
     });
   });
 
@@ -234,7 +234,7 @@ describe('log', () => {
         // expect fs untouched
         expect(fs.readFile).not.toBeCalled();
         expect(fs.writeFile).not.toBeCalled();
-        expect(fs.getMockFiles()).toEqual(EMPTY_FS);
+        expect(fs.getMockFiles()).toEqual(FS_EMPTY);
       });
   });
 
@@ -271,7 +271,7 @@ describe('log', () => {
 
   /** @test {JSONStorage#log} */
   it('should fail without affecting the json file if trying to log items that are already executed', () => {
-    fs.setMockFiles(NON_EMPTY_FS_2);
+    fs.setMockFiles(FS_2_MIGRATIONS);
 
     return storage.log(['1-mock', '1-migration'])
       .then(() => expect(undefined).toBeDefined())
@@ -279,13 +279,13 @@ describe('log', () => {
       .then(() => {
         // expect fs not edited
         expect(fs.writeFile).not.toBeCalled();
-        expect(fs.getMockFiles()).toEqual(NON_EMPTY_FS_2);
+        expect(fs.getMockFiles()).toEqual(FS_2_MIGRATIONS);
       });
   });
 
   /** @test {JSONStorage#log} */
   it('should not affect to existing items is the json file', () => {
-    fs.setMockFiles(NON_EMPTY_FS_2);
+    fs.setMockFiles(FS_2_MIGRATIONS);
 
     return storage.log(['1-migration', '2-migration'])
       .catch(error => expect(error).toBeUndefined())
@@ -309,7 +309,7 @@ describe('unlog', () => {
 
   beforeEach(() => {
     fs.resetMock();
-    fs.setMockFiles(NON_EMPTY_FS_3);
+    fs.setMockFiles(FS_3_MIGRATIONS);
     storage = new JSONStorage({ path: CUSTOM_PATH });
   });
 
@@ -325,7 +325,7 @@ describe('unlog', () => {
       // expect fs untouched
       expect(fs.readFile).not.toBeCalled();
       expect(fs.writeFile).not.toBeCalled();
-      expect(fs.getMockFiles()).toEqual(NON_EMPTY_FS_3);
+      expect(fs.getMockFiles()).toEqual(FS_3_MIGRATIONS);
     });
   });
 
@@ -342,7 +342,7 @@ describe('unlog', () => {
         // expect fs untouched
         expect(fs.readFile).not.toBeCalled();
         expect(fs.writeFile).not.toBeCalled();
-        expect(fs.getMockFiles()).toEqual(NON_EMPTY_FS_3);
+        expect(fs.getMockFiles()).toEqual(FS_3_MIGRATIONS);
       });
   });
 
@@ -365,7 +365,7 @@ describe('unlog', () => {
 
   /** @test {JSONStorage#unlog} */
   it('it should not create the json file if it doesn\'t exist', () => {
-    fs.setMockFiles(EMPTY_FS);
+    fs.setMockFiles(FS_EMPTY);
 
     return storage.unlog('1-migration')
       .then(() => expect(undefined).toBeDefined())
@@ -373,7 +373,7 @@ describe('unlog', () => {
       .then(() => {
         // expect fs not edited
         expect(fs.writeFile).not.toBeCalled();
-        expect(fs.getMockFiles()).toEqual(EMPTY_FS);
+        expect(fs.getMockFiles()).toEqual(FS_EMPTY);
       });
   });
 
@@ -385,13 +385,13 @@ describe('unlog', () => {
       .then(() => {
         // expect fs not edited
         expect(fs.writeFile).not.toBeCalled();
-        expect(fs.getMockFiles()).toEqual(NON_EMPTY_FS_3);
+        expect(fs.getMockFiles()).toEqual(FS_3_MIGRATIONS);
       });
   });
 
   /** @test {JSONStorage#unlog} */
   it('it should not add any items to the json file', () => {
-    fs.setMockFiles(NON_EMPTY_FS_3);
+    fs.setMockFiles(FS_3_MIGRATIONS);
 
     return storage.unlog(['1-mock', '2-mock'])
       .catch(error => expect(error).toBeUndefined())
