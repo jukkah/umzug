@@ -1,3 +1,5 @@
+/* eslint global-require: "off" */
+
 /**
  * @typedef {object} MigrationModule
  * @property {function} [`up`] Up function. Function name is configurable.
@@ -20,7 +22,7 @@ export default class Migration {
   /**
    * Constructs a new Migration.
    *
-   * @param {string|MigrationModule|MigrationModuleResolver} module
+   * @param {!string|MigrationModule|MigrationModuleResolver} module
    *     Path to file that can be required by Node.js, migration module itself,
    *     or resolver function that returns it.
    * @param {object} [options]
@@ -31,8 +33,20 @@ export default class Migration {
    * @param {function(fn: Function) : Function} [options.wrapper]
    *     Wrapper function for migration methods.
    */
-  constructor(module, options) {
+  constructor(module, options = {}) {
+    if (typeof module === 'string' || module instanceof String) {
+      this.module = file => require(file);
+    } else if (typeof module === 'function' || typeof module === 'object') {
+      this.module = module;
+    } else {
+      throw new Error(`Unsupported module: ${module}`);
+    }
 
+    this.options = {
+      up: options.up || 'up',
+      down: options.down || 'down',
+      wrapper: options.wrapper || (fn => fn),
+    };
   }
 
   /**
