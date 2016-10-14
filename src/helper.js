@@ -1,7 +1,7 @@
 /**
  * Make function with callback as its last parameter to return promise.
  *
- * @param {function(..., function(resolve, reject)) } fn callback function
+ * @param {function(...rest: *, cb: Function) } fn callback function
  * @returns {function() : Promise}
  */
 export function promisify(fn) {
