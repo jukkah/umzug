@@ -3,7 +3,7 @@
 import fs from 'fs';
 import _ from 'lodash';
 
-import helper from './Helper';
+import { promisify } from './helper';
 import Storage from './Storage';
 
 /**
@@ -13,7 +13,7 @@ import Storage from './Storage';
  * @return {Promise<string>}
  * @private
  */
-const readFile = helper.promisify(fs.readFile);
+const readFile = promisify(fs.readFile);
 
 /**
  * Write content to file.
@@ -23,7 +23,7 @@ const readFile = helper.promisify(fs.readFile);
  * @returns {Promise}
  * @private
  */
-const writeFile = helper.promisify(fs.writeFile);
+const writeFile = promisify(fs.writeFile);
 
 /**
  * A storage that saves executed migrations to JSON file.
