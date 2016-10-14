@@ -15,3 +15,13 @@ export function promisify(fn) {
     });
   });
 }
+
+/**
+ * If given parameter is a function, resolve it. Otherwise return it as is.
+ *
+ * @param {Function|*} fn function to resolve or anything else.
+ * @returns {*}
+ */
+export function call(fn) {
+  return typeof fn === 'function' ? fn() : fn;
+}

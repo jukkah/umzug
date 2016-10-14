@@ -1,3 +1,5 @@
+/* eslint arrow-body-style: "off" */
+
 import Migration from '../Migration';
 
 /** @test {Migration} */
@@ -91,5 +93,103 @@ describe('constructor', () => {
         expect(migration).toEqual(jasmine.any(Migration));
         expect(wrapper).not.toBeCalled();
       });
+  });
+});
+
+/** @test {Migration} */
+describe('migrations', () => {
+  let migration;
+
+  beforeEach(() => {
+    migration = new Migration({
+      up() {},
+      down() {},
+      migrations: ['1-migration', '2-migration'],
+    });
+  });
+
+  /** @test {Migration#migrations} */
+  it('should not require any parameters', () => {
+    return Promise.resolve()
+      .then(migration.migrations())
+      .catch(error => expect(error).toBeUndefined());
+  });
+
+  /** @test {Migration#migrations} */
+  it('should return Promise that resolves to string list', () => {
+    const result = migration.migrations();
+
+    expect(result).toEqual(jasmine.any(Promise));
+
+    return result
+      .then((value) => {
+        expect(value).toEqual(jasmine.any(Array));
+        value.forEach(item => expect(item).toEqual(jasmine.any(String)));
+      });
+  });
+
+  /** @test {Migration#migrations} */
+  it('should resolve to string list specified in migrations', () => {
+    return migration.migrations()
+      .catch(error => expect(error).toBeUndefined())
+      .then((value) => {
+        expect(value).toEqual(['1-migration', '2-migration']);
+      });
+  });
+
+  /** @test {Migration#migrations} */
+  it('should resolve to result of resolver function', () => {
+    const MIGRATIONS = [];
+    const FN = jest.fn(() => MIGRATIONS);
+    migration = new Migration({
+      migrations: FN,
+    });
+
+    return migration.migrations()
+      .catch(error => expect(error).toBeUndefined())
+      .then((value) => {
+        expect(FN).toBeCalled();
+        expect(value).toBe(MIGRATIONS);
+      });
+  });
+
+  /** @test {Migration#migrations} */
+  it('should resolve to filename if migrations is not specified', () => {
+    migration = new Migration('./__tests__/Migration.test.js');
+
+    return migration.migrations()
+      .catch(error => expect(error).toBeUndefined())
+      .then((value) => {
+        expect(value).toEqual(['Migration.test.js']);
+      });
+  });
+
+  /** @test {Migration#migrations} */
+  it('should fail if module file can\'t be found', () => {
+    migration = new Migration('./nonexisting-file.js');
+
+    return migration.migrations()
+      .then(() => expect(undefined).toBeDefined())
+      .catch(error => expect(error).toBeDefined());
+  });
+
+  /** @test {Migration#migrations} */
+  it('should fail if module can\'t be resolved', () => {
+    migration = new Migration(() => undefined);
+
+    return migration.migrations()
+      .then(() => expect(undefined).toBeDefined())
+      .catch(error => expect(error).toBeDefined());
+  });
+
+  /** @test {Migration#migrations} */
+  it('should fail if migrations can\'t be resolved', () => {
+    migration = new Migration({
+      migrations: jest.fn(() => { throw new Error(); }),
+    });
+
+    return migration.migrations()
+      .then(() => expect(undefined).toBeDefined())
+      .catch(error => expect(error).toBeDefined());
   });
 });

@@ -1,5 +1,9 @@
 /* eslint global-require: "off" */
 
+import path from 'path';
+
+import { call } from './helper';
+
 /**
  * @typedef {object} MigrationModule
  * @property {function} [`up`] Up function. Function name is configurable.
@@ -35,7 +39,8 @@ export default class Migration {
    */
   constructor(module, options = {}) {
     if (typeof module === 'string' || module instanceof String) {
-      this.module = file => require(file);
+      this.module = () => require(module);
+      this.filename = path.basename(module);
     } else if (typeof module === 'function' || typeof module === 'object') {
       this.module = module;
     } else {
@@ -134,6 +139,18 @@ export default class Migration {
    * @returns {Promise<string[]>}
    */
   migrations() {
-    return Promise.resolve([]);
+    return Promise.resolve()
+      .then(() => call(this.module))
+      .then(module => call(module.migrations || this.filename))
+      .then(migrations => (Array.isArray(migrations) ? migrations : [migrations]))
+      .then((migrations) => {
+        migrations.forEach((item) => {
+          if (typeof item === 'string' || item instanceof String) {
+            // TODO: throw or warn about unsupported return value.
+          }
+        });
+
+        return migrations;
+      });
   }
 }
