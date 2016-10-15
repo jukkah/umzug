@@ -30,16 +30,27 @@ export default class Migration {
    *     Path to file that can be required by Node.js, migration module itself,
    *     or resolver function that returns it.
    * @param {object} [options]
-   * @param {string|function(module: object) : string} [options.up='up']
+   * @param {string|function(module: MigrationModule) : string} [options.up='up']
    *     Up method resolver; either its name or function that return it.
-   * @param {string|function(module: object) : string} [options.down='down']
+   * @param {string|function(module: MigrationModule) : string} [options.down='down']
    *     Down method resolver; either its name or function that return it.
    * @param {function(fn: Function) : Function} [options.wrapper]
    *     Wrapper function for migration methods.
    */
   constructor(module, options = {}) {
     if (typeof module === 'string' || module instanceof String) {
+      /**
+       * Migration module or its resolver function.
+       *
+       * @type {MigrationModule|function() : MigrationModule}
+       */
       this.module = () => require(module);
+
+      /**
+       * Basename of the migration file.
+       *
+       * @type {string}
+       */
       this.filename = path.basename(module);
     } else if (typeof module === 'function' || typeof module === 'object') {
       this.module = module;
@@ -47,6 +58,17 @@ export default class Migration {
       throw new Error(`Unsupported module: ${module}`);
     }
 
+    /**
+     * Options passed to constructor.
+     *
+     * @type {object}
+     * @property {string|function(module: MigrationModule) : string} [up='up']
+     *     Up method resolver; either its name or function that return it.
+     * @property {string|function(module: MigrationModule) : string} [down='down']
+     *     Down method resolver; either its name or function that return it.
+     * @property {function(fn: Function) : Function} [wrapper]
+     *     Wrapper function for migration methods.
+     */
     this.options = {
       up: options.up || 'up',
       down: options.down || 'down',

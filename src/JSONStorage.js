@@ -45,6 +45,11 @@ export default class JSONStorage extends Storage {
   constructor(options = {}) {
     super();
 
+    /**
+     * Path to JSON file.
+     *
+     * @type {string}
+     */
     this.file = options.path || './umzug.json';
   }
 
