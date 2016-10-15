@@ -97,6 +97,112 @@ describe('constructor', () => {
 });
 
 /** @test {Migration} */
+describe('exists', () => {
+  let migration;
+
+  beforeEach(() => {
+    migration = new Migration({
+      up() {},
+      down() {},
+      migrations: ['1-migration', '2-migration'],
+    });
+  });
+
+  /** @test {Migration#exists} */
+  it('should not require any parameters', () => {
+    return Promise.resolve()
+      .then(() => migration.exists())
+      .catch(error => expect(error).toBeUndefined());
+  });
+
+  /** @test {Migration#exists} */
+  it('should return a Promise that resolves to boolean', () => {
+    const result = migration.exists();
+
+    expect(result).toEqual(jasmine.any(Promise));
+
+    return result
+      .then((value) => {
+        expect(value).toEqual(jasmine.any(Boolean));
+      });
+  });
+
+  /** @test {Migration#exists} */
+  it('should resolve to true if migration file exists', () => {
+    migration = new Migration('./__tests__/Migration.test.js');
+
+    return Promise.resolve()
+      .then(() => migration.exists())
+      .catch(error => expect(error).toBeUndefined())
+      .then(result => expect(result).toBe(true));
+  });
+
+  /** @test {Migration#exists} */
+  it('should resolve to false if migration file doesn\'t exist', () => {
+    migration = new Migration('./nonexisting-file.js');
+
+    return Promise.resolve()
+      .then(() => migration.exists())
+      .catch(error => expect(error).toBeUndefined())
+      .then(result => expect(result).toBe(false));
+  });
+
+  /** @test {Migration#exists} */
+  it('should resolve to true if module is an object', () => {
+    return Promise.resolve()
+      .then(() => migration.exists())
+      .catch(error => expect(error).toBeUndefined())
+      .then(result => expect(result).toBe(true));
+  });
+
+  /** @test {Migration#exists} */
+  it('should resolve to true if module resolver returns an object', () => {
+    const FN = jest.fn(() => ({
+      up() {},
+      down() {},
+      migrations: ['1-migration', '2-migration'],
+    }));
+    migration = new Migration(FN);
+
+    return Promise.resolve()
+      .then(() => migration.exists())
+      .catch(error => expect(error).toBeUndefined())
+      .then((result) => {
+        expect(result).toBe(true);
+        expect(FN).toBeCalled();
+      });
+  });
+
+  /** @test {Migration#exists} */
+  it('should resolve to false if module resolver doesn\'t return an object', () => {
+    const FN = jest.fn(() => undefined);
+    migration = new Migration(FN);
+
+    return Promise.resolve()
+      .then(() => migration.exists())
+      .catch(error => expect(error).toBeUndefined())
+      .then((result) => {
+        expect(result).toBe(false);
+        expect(FN).toBeCalled();
+      });
+  });
+
+  /** @test {Migration#exists} */
+  it('should resolve to false if module resolver fails', () => {
+    const FN = jest.fn(() => { throw new Error(); });
+    migration = new Migration(FN);
+
+    return Promise.resolve()
+      .then(() => migration.exists())
+      .catch(error => expect(error).toBeUndefined())
+      .then((result) => {
+        expect(result).toBe(false);
+        expect(FN).toBeCalled();
+      });
+  });
+});
+
+/** @test {Migration} */
 describe('migrations', () => {
   let migration;
 

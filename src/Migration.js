@@ -100,7 +100,12 @@ export default class Migration {
    * @returns {Promise<boolean>}
    */
   exists() {
-    return Promise.resolve(false);
+    return Promise.resolve()
+      .then(() => {
+        const module = call(this.module);
+        return typeof module === 'object';
+      })
+      .catch(() => false);
   }
 
   /**
