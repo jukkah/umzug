@@ -25,3 +25,13 @@ export function promisify(fn) {
 export function call(fn) {
   return typeof fn === 'function' ? fn() : fn;
 }
+
+/**
+ * Check if value is string.
+ *
+ * @param value Value to check.
+ * @returns {boolean}
+ */
+export function isString(value) {
+  return typeof value === 'string' || value instanceof String;
+}

@@ -203,6 +203,216 @@ describe('exists', () => {
 });
 
 /** @test {Migration} */
+describe('is', () => {
+  let migration;
+
+  beforeEach(() => {
+    migration = new Migration('./file.js');
+  });
+
+  /** @test {Migration#is} */
+  it('should require another migration as parameter', () => {
+    return Promise.all([
+      Promise.resolve()
+        .then(() => migration.is())
+        .then(() => expect(undefined).toBeDefined())
+        .catch(error => expect(error).toBeDefined()),
+      Promise.resolve()
+        .then(() => migration.is(''))
+        .catch(error => expect(error).toBeUndefined()),
+    ]);
+  });
+
+  /** @test {Migration#is} */
+  it('should return a Promise that resolves to boolean', () => {
+    const result = migration.is('');
+
+    expect(result).toEqual(jasmine.any(Promise));
+
+    return result
+      .then((value) => {
+        expect(value).toEqual(jasmine.any(Boolean));
+      });
+  });
+
+  /** @test {Migration#is} */
+  it('should resolve to true if called with a string that is the name of normal migration', () => {
+    migration = new Migration({
+      migrations: '1-migration.js',
+    });
+
+    return Promise.resolve()
+      .then(() => migration.is('1-migration'))
+      .catch(error => expect(error).toBeUndefined())
+      .then(result => expect(result).toBe(true));
+  });
+
+  /** @test {Migration#is} */
+  it('should resolve to false if called with a string that isn\'t the name of normal migration', () => {
+    migration = new Migration({
+      migrations: '1-migration.js',
+    });
+
+    return Promise.resolve()
+      .then(() => migration.is('1-mock'))
+      .catch(error => expect(error).toBeUndefined())
+      .then(result => expect(result).toBe(false));
+  });
+
+  /** @test {Migration#is} */
+  it('should resolve to true if called with a string that is in migrations of squashed migration', () => {
+    migration = new Migration({
+      migrations: ['1-migration.js', '2-migration.js'],
+    });
+
+    return Promise.resolve()
+      .then(() => migration.is('1-migration'))
+      .catch(error => expect(error).toBeUndefined())
+      .then(result => expect(result).toBe(true));
+  });
+
+  /** @test {Migration#is} */
+  it('should resolve to false if called with a string that isn\'t in migrations of squashed migration', () => {
+    migration = new Migration({
+      migrations: ['1-migration.js', '2-migration.js'],
+    });
+
+    return Promise.resolve()
+      .then(() => migration.is('1-mock'))
+      .catch(error => expect(error).toBeUndefined())
+      .then(result => expect(result).toBe(false));
+  });
+
+  /** @test {Migration#is} */
+  it('should resolve to true if called with a normal migration whose name is the name of normal migration', () => {
+    migration = new Migration({
+      migrations: '1-migration.js',
+    });
+
+    const another = new Migration({
+      migrations: '1-migration',
+    });
+
+    return Promise.resolve()
+      .then(() => migration.is(another))
+      .catch(error => expect(error).toBeUndefined())
+      .then(result => expect(result).toBe(true));
+  });
+
+  /** @test {Migration#is} */
+  it('should resolve to false if called with a normal migration whose name isn\'t the name of normal migration', () => {
+    migration = new Migration({
+      migrations: '1-migration.js',
+    });
+
+    const another = new Migration({
+      migrations: '1-mock',
+    });
+
+    return Promise.resolve()
+      .then(() => migration.is(another))
+      .catch(error => expect(error).toBeUndefined())
+      .then(result => expect(result).toBe(false));
+  });
+
+  /** @test {Migration#is} */
+  it('should resolve to true if called with a normal migration whose name is in migrations of squashed migration', () => {
+    migration = new Migration({
+      migrations: ['1-migration.js', '2-migration.js'],
+    });
+
+    const another = new Migration({
+      migrations: '1-migration',
+    });
+
+    return Promise.resolve()
+      .then(() => migration.is(another))
+      .catch(error => expect(error).toBeUndefined())
+      .then(result => expect(result).toBe(true));
+  });
+
+  /** @test {Migration#is} */
+  it('should resolve to false if called with a normal migration whose name isn\'t in migrations of squashed migration', () => {
+    migration = new Migration({
+      migrations: ['1-migration.js', '2-migration.js'],
+    });
+
+    const another = new Migration({
+      migrations: '1-mock',
+    });
+
+    return Promise.resolve()
+      .then(() => migration.is(another))
+      .catch(error => expect(error).toBeUndefined())
+      .then(result => expect(result).toBe(false));
+  });
+
+  /** @test {Migration#is} */
+  it('should resolve to true if called with a squashed migration whose migrations contains only the name of normal migration', () => {
+    migration = new Migration({
+      migrations: '1-migration.js',
+    });
+
+    const another = new Migration({
+      migrations: ['1-migration'],
+    });
+
+    return Promise.resolve()
+      .then(() => migration.is(another))
+      .catch(error => expect(error).toBeUndefined())
+      .then(result => expect(result).toBe(true));
+  });
+
+  /** @test {Migration#is} */
+  it('should resolve to false if called with a squashed migration whose migrations doesn\'t contain only the name of normal migration', () => {
+    migration = new Migration({
+      migrations: '1-migration.js',
+    });
+
+    const another = new Migration({
+      migrations: ['1-mock'],
+    });
+
+    return Promise.resolve()
+      .then(() => migration.is(another))
+      .catch(error => expect(error).toBeUndefined())
+      .then(result => expect(result).toBe(false));
+  });
+
+  /** @test {Migration#is} */
+  it('should resolve to true if called with a squashed migration whose migrations are all in migrations of squashed migration', () => {
+    migration = new Migration({
+      migrations: ['1-migration.js', '2-migration.js', '3-migration.js'],
+    });
+
+    const another = new Migration({
+      migrations: ['1-migration', '2-migration'],
+    });
+
+    return Promise.resolve()
+      .then(() => migration.is(another))
+      .catch(error => expect(error).toBeUndefined())
+      .then(result => expect(result).toBe(true));
+  });
+
+  /** @test {Migration#is} */
+  it('should resolve to false if called with a squashed migration whose migrations aren\'t all in migrations of squashed migration', () => {
+    migration = new Migration({
+      migrations: ['1-migration.js', '2-migration.js', '3-migration.js'],
+    });
+
+    const another = new Migration({
+      migrations: ['1-migration', '2-mock'],
+    });
+
+    return Promise.resolve()
+      .then(() => migration.is(another))
+      .catch(error => expect(error).toBeUndefined())
+      .then(result => expect(result).toBe(false));
+  });
+});
+
+/** @test {Migration} */
 describe('migrations', () => {
   let migration;
 

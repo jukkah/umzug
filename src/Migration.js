@@ -2,7 +2,7 @@
 
 import path from 'path';
 
-import { call } from './helper';
+import { call, isString } from './helper';
 
 /**
  * @typedef {object} MigrationModule
@@ -141,10 +141,14 @@ export default class Migration {
    * migration.is(anotherMigration).then(...)
    *
    * @param {string|Migration} another Another migration which to compare.
-   * @returns {boolean}
+   * @returns {Promise<boolean>}
    */
   is(another) {
-    return false;
+    return Promise.resolve()
+      .then(() => (another instanceof Migration ? another.migrations() : another))
+      .then(migrations => (Array.isArray(migrations) ? migrations : [migrations]))
+      .then(migrations => this.hasEvery(migrations))
+      .catch(() => false);
   }
 
   /**
@@ -172,12 +176,37 @@ export default class Migration {
       .then(migrations => (Array.isArray(migrations) ? migrations : [migrations]))
       .then((migrations) => {
         migrations.forEach((item) => {
-          if (typeof item === 'string' || item instanceof String) {
+          if (!isString(item)) {
             // TODO: throw or warn about unsupported return value.
           }
         });
 
         return migrations;
       });
+  }
+
+  /**
+   * Check if others are all in migrations.
+   *
+   * @param {string[]} others Other migrations.
+   * @returns {Promise<boolean>}
+   * @private
+   */
+  hasEvery(others) {
+    return Promise
+      .all(others.map(another => this.hasOne(another)))
+      .then(all => all.every(result => result));
+  }
+
+  /**
+   * Check if another is in migrations.
+   *
+   * @param {string} another Another migration.
+   * @returns {Promise<boolean>}
+   * @private
+   */
+  hasOne(another) {
+    return this.migrations()
+      .then(migrations => migrations.some(migration => migration.startsWith(another)));
   }
 }
