@@ -1,4 +1,4 @@
-/* eslint no-param-reassign: "off" */
+/* eslint no-param-reassign: 0 */
 
 import fs from 'fs';
 import _ from 'lodash';

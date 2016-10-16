@@ -1,5 +1,5 @@
-/* eslint no-useless-constructor: "off", class-methods-use-this: "off",
-          no-empty-function: "off", no-unused-vars: "off" */
+/* eslint no-useless-constructor: 0, class-methods-use-this: 0,
+          no-empty-function: 0, no-unused-vars: 0 */
 
 /**
  * A basic storage implementation that doesn't save anything.

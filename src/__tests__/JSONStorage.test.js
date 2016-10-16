@@ -1,4 +1,4 @@
-/* eslint import/imports-first: "off", arrow-body-style: "off" */
+/* eslint import/imports-first: 0, arrow-body-style: 0 */
 
 jest.mock('fs');
 

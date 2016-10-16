@@ -1,4 +1,4 @@
-/* eslint global-require: "off" */
+/* eslint global-require: 0 */
 
 import path from 'path';
 

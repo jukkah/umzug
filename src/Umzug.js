@@ -1,4 +1,4 @@
-/* eslint no-irregular-whitespace: "off" */
+/* eslint no-irregular-whitespace: 0 */
 
 import EventEmitter from 'events';
 import Storage from './Storage';

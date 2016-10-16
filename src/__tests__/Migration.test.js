@@ -1,4 +1,4 @@
-/* eslint arrow-body-style: "off" */
+/* eslint arrow-body-style: 0 */
 
 import Migration from '../Migration';
 
