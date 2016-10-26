@@ -26,8 +26,8 @@ export default class Storage {
    * @param {...string|string[]} migrations Migrations to log.
    * @returns {Promise}
    */
-  log(...migrations) {
-    return Promise.resolve();
+  async log(...migrations) {
+
   }
 
   /**
@@ -44,8 +44,8 @@ export default class Storage {
    * @param {string|string[]} migrations Migrations to unlog.
    * @returns {Promise}
    */
-  unlog(...migrations) {
-    return Promise.resolve();
+  async unlog(...migrations) {
+
   }
 
   /**
@@ -71,7 +71,7 @@ export default class Storage {
    *     `Promise<Array<{name: string, timestamp: string}>>`. Otherwise,
    *     _without timestamps_, it is `Promise<string[]>`.
    */
-  executed(options) {
-    return Promise.resolve([]);
+  async executed(options) {
+    return [];
   }
 }

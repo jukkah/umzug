@@ -85,8 +85,8 @@ export default class Migration {
    *
    * @returns {Promise}
    */
-  up() {
-    return Promise.resolve();
+  async up() {
+
   }
 
   /**
@@ -98,8 +98,8 @@ export default class Migration {
    *
    * @returns {Promise}
    */
-  down() {
-    return Promise.resolve();
+  async down() {
+
   }
 
   /**
@@ -121,13 +121,13 @@ export default class Migration {
    *
    * @returns {Promise<boolean>}
    */
-  exists() {
-    return Promise.resolve()
-      .then(() => {
-        const module = call(this.module);
-        return typeof module === 'object';
-      })
-      .catch(() => false);
+  async exists() {
+    try {
+      const module = call(this.module);
+      return typeof module === 'object';
+    } catch (e) {
+      return false;
+    }
   }
 
   /**
@@ -143,12 +143,10 @@ export default class Migration {
    * @param {string|Migration} another Another migration which to compare.
    * @returns {Promise<boolean>}
    */
-  is(another) {
-    return Promise.resolve()
-      .then(() => (another instanceof Migration ? another.migrations() : another))
-      .then(migrations => (Array.isArray(migrations) ? migrations : [migrations]))
-      .then(migrations => this.hasEvery(migrations))
-      .catch(() => false);
+  async is(another) {
+    let migrations = await (another instanceof Migration ? another.migrations() : another);
+    migrations = Array.isArray(migrations) ? migrations : [migrations];
+    return await this.hasEvery(migrations).catch(() => false);
   }
 
   /**
@@ -169,20 +167,18 @@ export default class Migration {
    *
    * @returns {Promise<string[]>}
    */
-  migrations() {
-    return Promise.resolve()
-      .then(() => call(this.module))
-      .then(module => call(module.migrations || this.filename))
-      .then(migrations => (Array.isArray(migrations) ? migrations : [migrations]))
-      .then((migrations) => {
-        migrations.forEach((item) => {
-          if (!isString(item)) {
-            // TODO: throw or warn about unsupported return value.
-          }
-        });
+  async migrations() {
+    const module = call(this.module);
+    let migrations = call(module.migrations || this.filename);
+    migrations = Array.isArray(migrations) ? migrations : [migrations];
 
-        return migrations;
-      });
+    for (const migration of migrations) {
+      if (!isString(migration)) {
+        // TODO: throw or warn about unsupported return value.
+      }
+    }
+
+    return migrations;
   }
 
   /**
@@ -192,10 +188,14 @@ export default class Migration {
    * @returns {Promise<boolean>}
    * @private
    */
-  hasEvery(others) {
-    return Promise
-      .all(others.map(another => this.hasOne(another)))
-      .then(all => all.every(result => result));
+  async hasEvery(others) {
+    for (const another of others) {
+      if (!await this.hasOne(another)) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   /**
@@ -205,8 +205,8 @@ export default class Migration {
    * @returns {Promise<boolean>}
    * @private
    */
-  hasOne(another) {
-    return this.migrations()
-      .then(migrations => migrations.some(migration => migration.startsWith(another)));
+  async hasOne(another) {
+    const migrations = await this.migrations();
+    return migrations.some(migration => migration.startsWith(another));
   }
 }

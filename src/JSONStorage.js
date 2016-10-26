@@ -67,24 +67,22 @@ export default class JSONStorage extends Storage {
    * @param {...string|string[]} migrations Migrations to log.
    * @returns {Promise}
    */
-  log(...migrations) {
+  async log(...migrations) {
     const timestamp = (new Date()).toJSON();
     migrations = _.flattenDeep(migrations || []);
     migrations = migrations.map(name => ({ name, timestamp }));
-    if (migrations.length === 0) return Promise.resolve();
+
+    if (migrations.length === 0) return;
     if (_.uniq(migrations).length < migrations.length) {
-      return Promise.reject(new Error('Duplicates are not allowed in param ...migrations'));
+      throw new Error('Duplicates are not allowed in param ...migrations');
     }
 
-    return this.executed({ withTimestamps: true })
-      .then((all) => {
-        if (_.intersectionBy(all, migrations, 'name').length > 0) {
-          throw new Error('Some migrations were already executed');
-        }
-        return all;
-      })
-      .then(executed => [...executed, ...migrations])
-      .then(all => writeFile(this.file, JSON.stringify(all)));
+    const executed = await this.executed({ withTimestamps: true });
+    if (_.intersectionBy(executed, migrations, 'name').length > 0) {
+      throw new Error('Some migrations were already executed');
+    }
+    const all = [...executed, ...migrations];
+    await writeFile(this.file, JSON.stringify(all));
   }
 
   /**
@@ -101,23 +99,21 @@ export default class JSONStorage extends Storage {
    * @param {...string|string[]} migrations Migrations to unlog.
    * @returns {Promise}
    */
-  unlog(...migrations) {
+  async unlog(...migrations) {
     migrations = _.flattenDeep(migrations || []);
     migrations = migrations.map(name => ({ name }));
-    if (migrations.length === 0) return Promise.resolve();
+
+    if (migrations.length === 0) return;
     if (_.uniq(migrations).length < migrations.length) {
-      return Promise.reject(new Error('Duplicates are not allowed in param ...migrations'));
+      throw new Error('Duplicates are not allowed in param ...migrations');
     }
 
-    return this.executed({ withTimestamps: true })
-      .then((all) => {
-        if (_.differenceBy(migrations, all, 'name').length > 0) {
-          throw new Error('Some migrations were not already executed');
-        }
-        return all;
-      })
-      .then(all => _.differenceBy(all, migrations, 'name'))
-      .then(rest => writeFile(this.file, JSON.stringify(rest)));
+    const all = await this.executed({ withTimestamps: true });
+    if (_.differenceBy(migrations, all, 'name').length > 0) {
+      throw new Error('Some migrations were not already executed');
+    }
+    const rest = _.differenceBy(all, migrations, 'name');
+    await writeFile(this.file, JSON.stringify(rest));
   }
 
   /**
@@ -143,12 +139,11 @@ export default class JSONStorage extends Storage {
    *     `Promise<Array<{name: string, timestamp: string}>>`. Otherwise,
    *     _without timestamps_, it is `Promise<string[]>`.
    */
-  executed(options = {}) {
-    return readFile(this.file)
-      .catch(() => '[]')
-      .then(content => JSON.parse(content))
-      .then(result => result.map(entry => (
-        options.withTimestamps ? entry : entry.name
-      )));
+  async executed(options = {}) {
+    const content = await readFile(this.file).catch(() => '[]');
+    const json = JSON.parse(content);
+    return json.map(entry => (
+      options.withTimestamps ? entry : entry.name
+    ));
   }
 }

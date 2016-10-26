@@ -152,8 +152,8 @@ export default class Umzug extends EventEmitter {
    *     migrations with source code not available.
    * @returns {Promise<Migration[]>}
    */
-  executed(options) {
-    return Promise.resolve([]);
+  async executed(options) {
+    return [];
   }
 
   /**
@@ -165,8 +165,8 @@ export default class Umzug extends EventEmitter {
    *
    * @returns {Promise<Migration[]>}
    */
-  pending() {
-    return Promise.resolve([]);
+  async pending() {
+    return [];
   }
 
   /**
@@ -212,8 +212,8 @@ export default class Umzug extends EventEmitter {
    *     If _failFast_ was enabled, the result contains only executed/skipped
    *     migrations and failed migration as the end.
    */
-  up(migrations, options) {
-    return Promise.resolve(new Map());
+  async up(migrations, options) {
+    return new Map();
   }
 
   /**
@@ -259,7 +259,7 @@ export default class Umzug extends EventEmitter {
    *     If failFast was enabled, the result contains only executed/skipped
    *     migrations and failed migration as the end.
    */
-  down(migrations, options) {
-    return Promise.resolve(new Map());
+  async down(migrations, options) {
+    return new Map();
   }
 }
