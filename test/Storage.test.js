@@ -1,6 +1,8 @@
 /* eslint arrow-body-style: 0 */
 
-import Storage from '../Storage';
+import { expect } from 'chai';
+
+import Storage from '../src/Storage';
 
 /** @test {Storage} */
 describe('constructor', () => {

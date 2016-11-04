@@ -1,6 +1,8 @@
 /* eslint arrow-body-style: 0 */
 
-import Migration from '../Migration';
+import { expect } from 'chai';
+
+import Migration from '../src/Migration';
 
 /** @test {Migration} */
 describe('constructor', () => {

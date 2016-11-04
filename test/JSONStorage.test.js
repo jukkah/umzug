@@ -1,10 +1,12 @@
 /* eslint import/imports-first: 0, arrow-body-style: 0 */
 
-jest.mock('fs');
+//jest.mock('fs');
+
+import { expect } from 'chai';
 
 import fs from 'fs';
 
-import JSONStorage from '../JSONStorage';
+import JSONStorage from '../src/JSONStorage';
 
 const CUSTOM_PATH = './file.json';
 
