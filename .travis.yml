@@ -17,11 +17,14 @@ env:
   - SEQUELIZE=^2.0.0
   - SEQUELIZE=^3.0.0
 
+after_success: "npm run coveralls"
+
 before_script:
   - npm install sequelize@$(echo $SEQUELIZE)
 
 script:
-  - "npm test"
+  - "npm run lint"
+  - "npm run coverage"
 
 notifications:
   irc:

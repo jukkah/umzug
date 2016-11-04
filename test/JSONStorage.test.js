@@ -31,11 +31,11 @@ const FS_CORRUPTED = {
   [CUSTOM_PATH]: FS_2_MIGRATIONS[CUSTOM_PATH].slice(0, -1),
 };
 
-const ANY_ISO_DATE = jasmine.stringMatching(
+/*const ANY_ISO_DATE = jasmine.stringMatching(
   /^\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)$/
-);
+);*/
 
-describe('JSONStorage', () => {
+xdescribe('JSONStorage', () => {
   /** @test {JSONStorage} */
   describe('constructor', () => {
     beforeEach(() => {

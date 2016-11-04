@@ -4,7 +4,7 @@ import { expect } from 'chai';
 
 import Storage from '../src/Storage';
 
-describe('Storage', () => {
+xdescribe('Storage', () => {
   /** @test {Storage} */
   describe('constructor', () => {
     /** @test {Storage#constructor} */

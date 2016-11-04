@@ -4,7 +4,7 @@ import { expect } from 'chai';
 
 import Migration from '../src/Migration';
 
-describe('Migration', () => {
+xdescribe('Migration', () => {
   /** @test {Migration} */
   describe('constructor', () => {
     /** @test {Migration#constructor} */
