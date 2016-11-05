@@ -24,7 +24,7 @@ install:
   - "yarn"
 
 before_script:
-  - npm install sequelize@$(echo $SEQUELIZE)
+  - yarn add sequelize@$(echo $SEQUELIZE)
 
 script:
 #  - "npm run lint"
