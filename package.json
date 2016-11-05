@@ -43,8 +43,8 @@
     "yargs": "^5.0.0"
   },
   "scripts": {
-    "test": "./node_modules/.bin/mocha --compilers js:babel-register --require babel-polyfill test",
-    "coverage": "NODE_ENV=coverage ./node_modules/.bin/nyc --reporter=html npm run test",
+    "test": "./node_modules/.bin/mocha --compilers js:babel-register --require babel-polyfill test src",
+    "coverage": "NODE_ENV=coverage ./node_modules/.bin/nyc npm run test",
     "coveralls": "./node_modules/.bin/nyc report --reporter=text-lcov | ./node_modules/.bin/coveralls",
     "lint": "NODE_ENV=test ./node_modules/.bin/eslint src __mocks__",
     "docs": "./node_modules/.bin/esdoc -c esdoc.json",
