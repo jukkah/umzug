@@ -1,21 +1,25 @@
-/* eslint arrow-body-style: 0 */
+/* eslint arrow-body-style: 0, import/no-extraneous-dependencies: 0,
+          import/imports-first: 0 */
 
-import { expect } from 'chai';
+import chai, { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+
+chai.use(chaiAsPromised);
 
 import Storage from '../src/Storage';
 
-xdescribe('Storage', () => {
+describe('Storage', () => {
   /** @test {Storage} */
   describe('constructor', () => {
     /** @test {Storage#constructor} */
-    it('should not require any parameters', () => {
+    it('should not require any parameters', async () => {
       let storage;
 
       expect(() => {
         storage = new Storage();
-      }).not.toThrow();
+      }).to.not.throw();
 
-      expect(storage).toEqual(jasmine.any(Storage));
+      expect(storage).to.be.an.instanceof(Storage);
     });
   });
 
@@ -28,37 +32,25 @@ xdescribe('Storage', () => {
     });
 
     /** @test {Storage#executed} */
-    it('should not require any parameters', () => {
-      return new Promise((resolve) => {
-        expect(() => {
-          resolve(
-            storage.executed()
-          );
-        }).not.toThrow();
-      });
-    });
-
-    /** @test {Storage#executed} */
-    it('should return Promise that resolves to an empty array', () => {
+    it('should not require any parameters', async () => {
       const result = storage.executed();
 
-      expect(result).toEqual(jasmine.any(Promise));
-
-      return result
-        .then((value) => {
-          expect(value).toEqual([]);
-        });
+      await expect(result).to.eventually.be.fulfilled;
     });
 
     /** @test {Storage#executed} */
-    it('should accept withTimestamps = true as an option', () => {
-      return new Promise((resolve) => {
-        expect(() => {
-          resolve(
-              storage.executed({ withTimestamps: true })
-          );
-        }).not.toThrow();
-      });
+    it('should return an empty array', async () => {
+      const result = storage.executed();
+
+      await expect(result).to.eventually.be.an('array');
+      await expect(result).to.eventually.be.empty;
+    });
+
+    /** @test {Storage#executed} */
+    it('should accept withTimestamps = true as an option', async () => {
+      const result = storage.executed({ withTimestamps: true });
+
+      await expect(result).to.eventually.be.fulfilled;
     });
   });
 
@@ -71,63 +63,52 @@ xdescribe('Storage', () => {
     });
 
     /** @test {Storage#log} */
-    it('should not require any parameters', () => {
-      return new Promise((resolve) => {
-        expect(() => {
-          resolve(
-            storage.log()
-          );
-        }).not.toThrow();
-      });
-    });
-
-    /** @test {Storage#log} */
-    it('should return Promise that resolves to undefined', () => {
+    it('should not require any parameters', async () => {
       const result = storage.log();
 
-      expect(result).toEqual(jasmine.any(Promise));
-
-      return result
-        .then((value) => {
-          expect(value).toBeUndefined();
-        });
+      await expect(result).to.eventually.be.fulfilled;
     });
 
     /** @test {Storage#log} */
-    it('should accept multiple strings as parameter', () => {
-      return new Promise((resolve) => {
-        expect(() => {
-          Promise.resolve()
-            .then(() => storage.log('1-migration'))
-            .then(() => storage.log('2-migration', '3-migration'))
-            .then(resolve);
-        }).not.toThrow();
-      });
+    it('should return undefined', async () => {
+      const result = storage.log();
+
+      await expect(result).to.eventually.be.undefined;
     });
 
     /** @test {Storage#log} */
-    it('should accept an string array as parameter', () => {
-      return new Promise((resolve) => {
-        expect(() => {
-          Promise.resolve()
-            .then(() => storage.log([]))
-            .then(() => storage.log('1-migration'))
-            .then(() => storage.log('2-migration', '3-migration'))
-            .then(resolve);
-        }).not.toThrow();
-      });
+    it('should accept multiple strings as parameter', async () => {
+      const results = [
+        storage.log('1-migration'),
+        storage.log('2-migration', '3-migration'),
+      ];
+
+      await Promise.all(results.map(
+        result => expect(result).to.be.eventually.fulfilled
+      ));
     });
 
     /** @test {Storage#log} */
-    it('should not remember what has been logged', () => {
-      return storage.log('1-migration')
-        .then(() => storage.executed())
-        .catch((error) => {
-          expect(error).not.toEqual(jasmine.any(Error));
-        })
-        .then((value) => {
-          expect(value).toEqual([]);
-        });
+    it('should accept an string array as parameter', async () => {
+      const results = [
+        storage.log([]),
+        storage.log('1-migration'),
+        storage.log('2-migration', '3-migration'),
+      ];
+
+      await Promise.all(results.map(
+        result => expect(result).to.be.eventually.fulfilled
+      ));
+    });
+
+    /** @test {Storage#log} */
+    it('should not remember what has been logged', async () => {
+      await storage.log('1-migration');
+      const result = storage.executed();
+
+      await expect(result).to.eventually.be.fulfilled;
+      await expect(result).to.eventually.be.an('array');
+      await expect(result).to.eventually.be.empty;
     });
   });
 
@@ -140,63 +121,52 @@ xdescribe('Storage', () => {
     });
 
     /** @test {Storage#unlog} */
-    it('should not require any parameters', () => {
-      return new Promise((resolve) => {
-        expect(() => {
-          resolve(
-            storage.unlog()
-          );
-        }).not.toThrow();
-      });
-    });
-
-    /** @test {Storage#unlog} */
-    it('should return Promise that resolves to undefined', () => {
+    it('should not require any parameters', async () => {
       const result = storage.unlog();
 
-      expect(result).toEqual(jasmine.any(Promise));
-
-      return result
-        .then((value) => {
-          expect(value).toBeUndefined();
-        });
+      await expect(result).to.eventually.be.fulfilled;
     });
 
     /** @test {Storage#unlog} */
-    it('should accept multiple strings as parameter', () => {
-      return new Promise((resolve) => {
-        expect(() => {
-          Promise.resolve()
-            .then(() => storage.unlog('1-migration'))
-            .then(() => storage.unlog('2-migration', '3-migration'))
-            .then(resolve);
-        }).not.toThrow();
-      });
+    it('should return undefined', async () => {
+      const result = storage.unlog();
+
+      await expect(result).to.eventually.be.undefined;
     });
 
     /** @test {Storage#unlog} */
-    it('should accept an string array as parameter', () => {
-      return new Promise((resolve) => {
-        expect(() => {
-          Promise.resolve()
-            .then(() => storage.unlog([]))
-            .then(() => storage.unlog('1-migration'))
-            .then(() => storage.unlog('2-migration', '3-migration'))
-            .then(resolve);
-        }).not.toThrow();
-      });
+    it('should accept multiple strings as parameter', async () => {
+      const results = [
+        storage.unlog('1-migration'),
+        storage.unlog('2-migration', '3-migration'),
+      ];
+
+      await Promise.all(results.map(
+        result => expect(result).to.be.eventually.fulfilled
+      ));
     });
 
     /** @test {Storage#unlog} */
-    it('should not remember what has been unlogged', () => {
-      return storage.unlog('1-migration')
-        .then(() => storage.executed())
-        .catch((error) => {
-          expect(error).not.toEqual(jasmine.any(Error));
-        })
-        .then((value) => {
-          expect(value).toEqual([]);
-        });
+    it('should accept an string array as parameter', async () => {
+      const results = [
+        storage.unlog([]),
+        storage.unlog('1-migration'),
+        storage.unlog('2-migration', '3-migration'),
+      ];
+
+      await Promise.all(results.map(
+        result => expect(result).to.be.eventually.fulfilled
+      ));
+    });
+
+    /** @test {Storage#unlog} */
+    it('should not remember what has been unlogged', async () => {
+      await storage.unlog('1-migration');
+      const result = storage.executed();
+
+      await expect(result).to.eventually.be.fulfilled;
+      await expect(result).to.eventually.be.an('array');
+      await expect(result).to.eventually.be.empty;
     });
   });
 });
