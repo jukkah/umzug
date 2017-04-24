@@ -139,10 +139,10 @@ describe('migrations.wrap', () => {
       '\'use strict\';',
       '',
       'module.exports = {',
-      '  up(done) => {',
+      '  up(done) {',
       '    setTimeout(done, 200);',
       '  },',
-      '  down() => {}',
+      '  down() {}',
       '};'
       ].join('\n')
     );
@@ -211,8 +211,8 @@ describe('upName / downName', () => {
           '\'use strict\';',
           '',
           'module.exports = {',
-          '  myUp() => {},',
-          '  myDown() => {}',
+          '  myUp() {},',
+          '  myDown() {}',
           '};'
         ].join('\n')
     );
