@@ -10,7 +10,7 @@ module.exports = {
    * name to be required.
    * @returns {*|undefined} Required module
    */
-  resolve: function (packageName) {
+  resolve(packageName) {
     var result;
 
     try {

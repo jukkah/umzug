@@ -1,6 +1,6 @@
 'use strict';
 
-describe('storages', function () {
+describe('storages', () => {
   require('./json.test');
   require('./none.test');
   require('./sequelize.test');

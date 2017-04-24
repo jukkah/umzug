@@ -5,12 +5,12 @@ var Umzug     = require('../../lib/index');
 var sinon     = require('sinon');
 var helper    = require('../helper');
 
-describe('constructor', function () {
-  beforeEach(function() {
+describe('constructor', () => {
+  beforeEach(() => {
     helper.clearTmp();
   });
 
-  it('exposes some methods', function () {
+  it('exposes some methods', () => {
     var umzug = new Umzug();
 
     expect(umzug).to.have.property('execute');
@@ -20,25 +20,25 @@ describe('constructor', function () {
     expect(umzug).to.have.property('log');
   });
 
-  it('instantiates the default storage', function () {
+  it('instantiates the default storage', () => {
     var umzug = new Umzug();
     expect(umzug).to.have.property('storage');
   });
 
-  it('loads the specified storage module', function () {
+  it('loads the specified storage module', () => {
     var umzug = new Umzug({ storage: 'moment' });
     expect(umzug).to.have.property('storage');
   });
 
-  it('throws an error if the specified storage is neither a package nor a file', function () {
-    expect(function () {
+  it('throws an error if the specified storage is neither a package nor a file', () => {
+    expect(() => {
       new Umzug({ storage: 'nomnom' });
     }).to.throwError(
       'Unable to resolve the storage: nomnom, Error: Cannot find module \'nomnom\''
     );
   });
 
-  it('accepts a logging function', function () {
+  it('accepts a logging function', () => {
     var spy = sinon.spy();
     var umzug = new Umzug({ logging: spy });
     umzug.log();

@@ -39,9 +39,9 @@ module.exports = class JSONStorage {
     var writefile = Bluebird.promisify(fs.writeFile);
 
     return readfile(filePath)
-      .catch(function () { return '[]'; })
-      .then(function (content) { return JSON.parse(content); })
-      .then(function (content) {
+      .catch(() => { return '[]'; })
+      .then((content) => { return JSON.parse(content); })
+      .then((content) => {
         content.push(migrationName);
         return writefile(filePath, JSON.stringify(content, null, '  '));
       });
@@ -59,9 +59,9 @@ module.exports = class JSONStorage {
     var writefile = Bluebird.promisify(fs.writeFile);
 
     return readfile(filePath)
-      .catch(function () { return '[]'; })
-      .then(function (content) { return JSON.parse(content); })
-      .then(function (content) {
+      .catch(() => { return '[]'; })
+      .then((content) => { return JSON.parse(content); })
+      .then((content) => {
         content = _.without(content, migrationName);
         return writefile(filePath, JSON.stringify(content, null, '  '));
       });
@@ -77,8 +77,8 @@ module.exports = class JSONStorage {
     var readfile = Bluebird.promisify(fs.readFile);
 
     return readfile(filePath)
-      .catch(function () { return '[]'; })
-      .then(function (content) {
+      .catch(() => { return '[]'; })
+      .then((content) => {
         return JSON.parse(content);
       });
   }

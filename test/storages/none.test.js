@@ -4,34 +4,34 @@ var expect    = require('expect.js');
 var helper    = require('../helper');
 var Storage   = require('../../lib/storages/none');
 
-describe('none', function () {
-  beforeEach(function() {
+describe('none', () => {
+  beforeEach(() => {
     helper.clearTmp();
   });
 
-  describe('constructor', function () {
-    it('stores no options', function () {
+  describe('constructor', () => {
+    it('stores no options', () => {
       var storage = new Storage();
       expect(storage).to.not.have.property('options');
     });
   });
 
-  describe('executed', function () {
-    beforeEach(function () {
+  describe('executed', () => {
+    beforeEach(() => {
       this.storage = new Storage();
       return helper.prepareMigrations(3);
     });
 
-    it('returns an empty array', function () {
-      return this.storage.executed().then(function (data) {
+    it('returns an empty array', () => {
+      return this.storage.executed().then((data) => {
         expect(data).to.eql([]);
       });
     });
 
-    it('returns an empty array even if migrations were executed', function () {
-      return this.storage.logMigration('foo.js').bind(this).then(function () {
+    it('returns an empty array even if migrations were executed', () => {
+      return this.storage.logMigration('foo.js').then(() => {
         return this.storage.executed();
-      }).then(function (data) {
+      }).then((data) => {
         expect(data).to.eql([]);
       });
     });

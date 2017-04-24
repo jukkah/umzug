@@ -104,7 +104,7 @@ module.exports = class SequelizeStorage {
 
     return this._model()
       .sync()
-      .then(function(Model) {
+      .then((Model) => {
         var migration = {};
         migration[self.options.storageOptions.columnName] = migrationName;
         return Model.create(migration);
@@ -124,7 +124,7 @@ module.exports = class SequelizeStorage {
 
     return this._model()
       .sync()
-      .then(function(Model) {
+      .then((Model) => {
         var where = {};
         where[self.options.storageOptions.columnName] = migrationName;
 
@@ -147,11 +147,11 @@ module.exports = class SequelizeStorage {
 
     return this._model()
       .sync()
-      .then(function(Model) {
+      .then((Model) => {
         return Model.findAll({ order: [ [ self.options.storageOptions.columnName, 'ASC' ] ] });
       })
-      .then(function(migrations) {
-        return migrations.map(function(migration) {
+      .then((migrations) => {
+        return migrations.map((migration) => {
           return migration[self.options.storageOptions.columnName];
         });
       });
